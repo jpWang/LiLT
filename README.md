@@ -107,7 +107,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
         --do_train \
         --do_predict \
         --max_steps 2000 \
-        --per_device_train_batch_size 16 \
+        --per_device_train_batch_size 8 \
         --warmup_ratio 0.1 \
         --fp16
 ```
