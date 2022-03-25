@@ -2,6 +2,8 @@
 
 This is the official PyTorch implementation of the ACL 2022 paper: "[LiLT: A Simple yet Effective Language-Independent Layout Transformer for Structured Document Understanding](https://arxiv.org/abs/2202.13669)".
 
+<img src="./figs/framework.png" alt="framework"/>
+
 LiLT is pre-trained on the visually-rich documents of a single language (English) and can be directly fine-tuned on other languages with the corresponding off-the-shelf monolingual/multilingual pre-trained textual models. We hope the public availability of this work can help document intelligence researches.
 
 ## Installation
@@ -31,25 +33,13 @@ You can download our pre-processed data (~1.2GB) from [here](https://1drv.ms/u/s
 
 | Model                         | Language  | Size  | Download     | 
 | ----------------------------- | --------- | ----- | ------------ |
-| `lilt-infoxlm-base`           | MUL       | 846MB | [OneDrive](https://1drv.ms/u/s!Ahd-h7H5akVZfeIhAQ8KHELRvcc?e=WS1P82)    |
 | `lilt-roberta-en-base`        | EN        | 293MB | [OneDrive](https://1drv.ms/u/s!Ahd-h7H5akVZfhPVHQQ1tOypA48?e=nraHn3)    | 
+| `lilt-infoxlm-base`           | MUL       | 846MB | [OneDrive](https://1drv.ms/u/s!Ahd-h7H5akVZfeIhAQ8KHELRvcc?e=WS1P82)    |
 | `lilt-only-base`              | None      | 21MB  | [OneDrive](https://1drv.ms/u/s!Ahd-h7H5akVZfEIRbCmcWKjhoSM?e=6tMGbe)    | 
 
 If you want to combine the pre-trained LiLT with the *RoBERTa*s of **other languages**, please download  `lilt-only-base` and use `gen_weight_roberta_like.py` to generate your own pre-trained weight.
 
-For example, combine `lilt-only-base` with `microsoft/infoxlm-base`:
-
-~~~bash
-mkdir infoxlm-base
-wget https://huggingface.co/microsoft/infoxlm-base/resolve/main/config.json -O infoxlm-base/config.json
-wget https://huggingface.co/microsoft/infoxlm-base/resolve/main/pytorch_model.bin -O infoxlm-base/pytorch_model.bin
-python gen_weight_roberta_like.py \
-     --lilt lilt-only-base/pytorch_model.bin \
-     --text infoxlm-base/pytorch_model.bin \
-     --config infoxlm-base/config.json \
-     --out lilt-infoxlm-base
-~~~
-Or combine `lilt-only-base` with English `roberta-base`:
+For example, combine `lilt-only-base` with English `roberta-base`:
 
 ~~~bash
 mkdir roberta-en-base
@@ -62,40 +52,22 @@ python gen_weight_roberta_like.py \
      --out lilt-roberta-en-base
 ~~~
 
+Or combine `lilt-only-base` with `microsoft/infoxlm-base`:
+
+~~~bash
+mkdir infoxlm-base
+wget https://huggingface.co/microsoft/infoxlm-base/resolve/main/config.json -O infoxlm-base/config.json
+wget https://huggingface.co/microsoft/infoxlm-base/resolve/main/pytorch_model.bin -O infoxlm-base/pytorch_model.bin
+python gen_weight_roberta_like.py \
+     --lilt lilt-only-base/pytorch_model.bin \
+     --text infoxlm-base/pytorch_model.bin \
+     --config infoxlm-base/config.json \
+     --out lilt-infoxlm-base
+~~~
+
 
 ## Fine-tuning
 
-### Language-Specific (For example, ZH) Semantic Entity Recognition on XFUND
-
-```
-CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 examples/run_xfun_ser.py \
-        --model_name_or_path lilt-infoxlm-base \
-        --tokenizer_name xlm-roberta-base \
-        --output_dir ls_ser_xfund_lilt-infoxlm-base \
-        --do_train \
-        --do_eval \
-        --lang zh \
-        --max_steps 2000 \
-        --per_device_train_batch_size 16 \
-        --warmup_ratio 0.1 \
-        --fp16
-```
-
-### Language-Specific (For example, ZH) Relation Extraction on XFUND
-
-```
-CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 examples/run_xfun_re.py \
-        --model_name_or_path lilt-infoxlm-base \
-        --tokenizer_name xlm-roberta-base \
-        --output_dir ls_re_xfund_lilt-infoxlm-base \
-        --do_train \
-        --do_eval \
-        --lang zh \
-        --max_steps 20000 \
-        --per_device_train_batch_size 2 \
-        --warmup_ratio 0.1 \
-        --fp16
-```
 
 ### Semantic Entity Recognition on FUNSD
 
@@ -111,6 +83,54 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
         --warmup_ratio 0.1 \
         --fp16
 ```
+
+### Language-specific (For example, ZH) Semantic Entity Recognition on XFUND
+
+```
+CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 examples/run_xfun_ser.py \
+        --model_name_or_path lilt-infoxlm-base \
+        --tokenizer_name xlm-roberta-base \
+        --output_dir ls_ser_xfund_lilt-infoxlm-base \
+        --do_train \
+        --do_eval \
+        --lang zh \
+        --max_steps 2000 \
+        --per_device_train_batch_size 16 \
+        --warmup_ratio 0.1 \
+        --fp16
+```
+
+### Language-specific (For example, ZH) Relation Extraction on XFUND
+
+```
+CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 examples/run_xfun_re.py \
+        --model_name_or_path lilt-infoxlm-base \
+        --tokenizer_name xlm-roberta-base \
+        --output_dir ls_re_xfund_lilt-infoxlm-base \
+        --do_train \
+        --do_eval \
+        --lang zh \
+        --max_steps 20000 \
+        --per_device_train_batch_size 2 \
+        --warmup_ratio 0.1 \
+        --fp16
+```
+
+
+## Results
+
+### Semantic Entity Recognition on FUNSD
+<img src="./figs/funsd.png" width=500 alt="funsd"/>
+
+### Language-specific Fine-tuning on XFUND
+<img src="./figs/ls_xfund.png" alt="ls_xfund"/>
+
+### Cross-lingual Zero-shot Transfer on XFUND
+<img src="./figs/cl_xfund.png" alt="cl_xfund"/>
+
+### Multitask Fine-tuning on XFUND
+<img src="./figs/mt_xfund.png" alt="mt_xfund"/>
+
 
 
 ## Acknowledge
