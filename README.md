@@ -90,7 +90,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
 CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 examples/run_xfun_ser.py \
         --model_name_or_path lilt-infoxlm-base \
         --tokenizer_name xlm-roberta-base \
-        --output_dir ls_ser_xfund_lilt-infoxlm-base \
+        --output_dir ls_ser_xfund_zh_lilt-infoxlm-base \
         --do_train \
         --do_eval \
         --lang zh \
@@ -106,12 +106,13 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
 CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 examples/run_xfun_re.py \
         --model_name_or_path lilt-infoxlm-base \
         --tokenizer_name xlm-roberta-base \
-        --output_dir ls_re_xfund_lilt-infoxlm-base \
+        --output_dir ls_re_xfund_zh_lilt-infoxlm-base \
         --do_train \
         --do_eval \
         --lang zh \
-        --max_steps 20000 \
-        --per_device_train_batch_size 2 \
+        --max_steps 5000 \
+        --per_device_train_batch_size 8 \
+        --learning_rate  6.25e-6 \
         --warmup_ratio 0.1 \
         --fp16
 ```
