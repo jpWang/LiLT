@@ -7,8 +7,11 @@ from packaging import version
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 
-from transformers.trainer_utils import EvalPrediction, PredictionOutput, speed_metrics
 from transformers.utils import logging
+from transformers.file_utils import is_sagemaker_mp_enabled
+from transformers.trainer_utils import EvalPrediction, PredictionOutput, speed_metrics, ShardedDDPOption
+from transformers.trainer_pt_utils import get_parameter_names
+from transformers.optimization import Adafactor, AdamW, get_scheduler
 
 from .funsd_trainer import FunsdTrainer
 
@@ -195,3 +198,54 @@ class XfunReTrainer(FunsdTrainer):
         self.control = self.callback_handler.on_evaluate(self.args, self.state, self.control, metrics)
 
         return metrics
+
+    def create_optimizer(self, speedup_r=4.):
+        if self.optimizer is None:
+            decay_parameters = get_parameter_names(self.model, [torch.nn.LayerNorm])
+            decay_parameters = [name for name in decay_parameters if "bias" not in name]
+            speedup_parameters = [name for name in get_parameter_names(self.model, []) if 'extractor' in name and 'rel_classifier' not in name]
+            optimizer_grouped_parameters = [
+                {
+                    "params": [p for n, p in self.model.named_parameters() if n in decay_parameters and n in speedup_parameters],
+                    "weight_decay": self.args.weight_decay,
+                    "lr": self.args.learning_rate *speedup_r,
+                },
+                {
+                    "params": [p for n, p in self.model.named_parameters() if n not in decay_parameters and n in speedup_parameters],
+                    "weight_decay": 0.0,
+                    "lr": self.args.learning_rate *speedup_r,
+                },
+                {
+                    "params": [p for n, p in self.model.named_parameters() if n in decay_parameters and n not in speedup_parameters],
+                    "weight_decay": self.args.weight_decay,
+                    "lr": self.args.learning_rate,
+                },
+                {
+                    "params": [p for n, p in self.model.named_parameters() if n not in decay_parameters and n not in speedup_parameters],
+                    "weight_decay": 0.0,
+                    "lr": self.args.learning_rate,
+                },
+            ]
+            optimizer_cls = Adafactor if self.args.adafactor else AdamW
+            if self.args.adafactor:
+                optimizer_cls = Adafactor
+                optimizer_kwargs = {"scale_parameter": False, "relative_step": False}
+            else:
+                optimizer_cls = AdamW
+                optimizer_kwargs = {
+                    "betas": (self.args.adam_beta1, self.args.adam_beta2),
+                    "eps": self.args.adam_epsilon,
+                }
+
+            if self.sharded_ddp == ShardedDDPOption.SIMPLE:
+                self.optimizer = OSS(
+                    params=optimizer_grouped_parameters,
+                    optim=optimizer_cls,
+                    **optimizer_kwargs,
+                )
+            else:
+                self.optimizer = optimizer_cls(optimizer_grouped_parameters, **optimizer_kwargs)
+
+        if is_sagemaker_mp_enabled():
+            import smdistributed.modelparallel.torch as smp
+            self.optimizer = smp.DistributedOptimizer(self.optimizer)

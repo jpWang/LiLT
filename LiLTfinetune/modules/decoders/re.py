@@ -123,7 +123,9 @@ class REDecoder(nn.Module):
         relations, entities = self.build_relation(relations, entities)
         loss = 0
         all_pred_relations = []
-        
+        all_logits = []
+        all_labels = []
+
         for b in range(batch_size):
             head_entities = torch.tensor(relations[b]["head"], device=device)
             tail_entities = torch.tensor(relations[b]["tail"], device=device)
@@ -149,7 +151,11 @@ class REDecoder(nn.Module):
             heads = self.ffnn_head(head_repr)
             tails = self.ffnn_tail(tail_repr)
             logits = self.rel_classifier(heads, tails)
-            loss += self.loss_fct(logits, relation_labels)
             pred_relations = self.get_predicted_relations(logits, relations[b], entities[b])
             all_pred_relations.append(pred_relations)
+            all_logits.append(logits)
+            all_labels.append(relation_labels)
+        all_logits = torch.cat(all_logits, 0)
+        all_labels = torch.cat(all_labels, 0)
+        loss = self.loss_fct(all_logits, all_labels)
         return loss, all_pred_relations
