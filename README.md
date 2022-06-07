@@ -1,6 +1,6 @@
 # LiLT (ACL 2022)
 
-This is the official PyTorch implementation of the ACL 2022 paper: "[LiLT: A Simple yet Effective Language-Independent Layout Transformer for Structured Document Understanding](https://arxiv.org/abs/2202.13669)".
+This is the official PyTorch implementation of the ACL 2022 paper: "LiLT: A Simple yet Effective Language-Independent Layout Transformer for Structured Document Understanding". [[official](https://aclanthology.org/2022.acl-long.534/)] [[arXiv](https://arxiv.org/abs/2202.13669)] 
 
 <img src="./figs/framework.png" alt="framework"/>
 
@@ -27,9 +27,9 @@ Or check [Detectron2](https://github.com/facebookresearch/detectron2/releases)/[
 
 In this repository, we provide the fine-tuning codes for [FUNSD](https://guillaumejaume.github.io/FUNSD/) and [XFUND](https://github.com/doc-analysis/XFUND). 
 
-You can download our pre-processed data (~1.2GB) from [here](https://1drv.ms/u/s!Ahd-h7H5akVZeZQvKieg8g5THV8?e=mBRnxw), and put the unzipped `xfund&funsd/` under `LiLT/`. 
+You can download our **pre-processed data (~1.2GB)** from [**HERE**](https://1drv.ms/u/s!Ahd-h7H5akVZeZQvKieg8g5THV8?e=mBRnxw), and put the unzipped `xfund&funsd/` under `LiLT/`. 
 
-## Models
+## Available Checkpoints
 
 | Model                         | Language  | Size  | Download     | 
 | ----------------------------- | --------- | ----- | ------------ |
@@ -37,9 +37,11 @@ You can download our pre-processed data (~1.2GB) from [here](https://1drv.ms/u/s
 | `lilt-infoxlm-base`           | MUL       | 846MB | [OneDrive](https://1drv.ms/u/s!Ahd-h7H5akVZfeIhAQ8KHELRvcc?e=WS1P82)    |
 | `lilt-only-base`              | None      | 21MB  | [OneDrive](https://1drv.ms/u/s!Ahd-h7H5akVZfEIRbCmcWKjhoSM?e=6tMGbe)    | 
 
-If you want to combine the pre-trained LiLT with the *RoBERTa*s of **other languages**, please download  `lilt-only-base` and use `gen_weight_roberta_like.py` to generate your own pre-trained weight.
+## Or Generate Your Own Checkpoint (Optional)
 
-For example, combine `lilt-only-base` with English `roberta-base`:
+If you want to combine the pre-trained LiLT with **other language's *RoBERTa***, please download  `lilt-only-base` and use `gen_weight_roberta_like.py` to generate your own pre-trained checkpoint.
+
+**For example,** combine `lilt-only-base` with English `roberta-base`:
 
 ~~~bash
 mkdir roberta-en-base
@@ -172,12 +174,17 @@ The repository benefits greatly from [unilm/layoutlmft](https://github.com/micro
 ## Citation
 If our paper helps your research, please cite it in your publication(s):
 ```
-@inproceedings{wang2022LiLT,
-  title={LiLT: A Simple yet Effective Language-Independent Layout Transformer for Structured Document Understanding},
-  author={Wang, Jiapeng and Jin, Lianwen and Ding, Kai},
-  booktitle={ACL},
-  year={2022}
-  }
+@inproceedings{wang-etal-2022-lilt,
+    title = "{L}i{LT}: A Simple yet Effective Language-Independent Layout Transformer for Structured Document Understanding",
+    author={Wang, Jiapeng and Jin, Lianwen and Ding, Kai},
+    booktitle = "Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = may,
+    year = "2022",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2022.acl-long.534",
+    doi = "10.18653/v1/2022.acl-long.534",
+    pages = "7747--7757",
+}
 ```
 
 ## Feedback
