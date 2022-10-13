@@ -1,3 +1,9 @@
+# What's New
+
+[2022/10] LiLT has been added to 🤗[huggingface/transformers](https://github.com/huggingface/transformers) in [HERE](https://huggingface.co/docs/transformers/main/model_doc/lilt).
+
+[2022/03] Initial model and code release.
+
 # LiLT (ACL 2022)
 
 This is the official PyTorch implementation of the ACL 2022 paper: "LiLT: A Simple yet Effective Language-Independent Layout Transformer for Structured Document Understanding". [[official](https://aclanthology.org/2022.acl-long.534/)] [[arXiv](https://arxiv.org/abs/2202.13669)] 
