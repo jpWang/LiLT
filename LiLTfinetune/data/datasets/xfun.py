@@ -71,18 +71,11 @@ class XFUN(datasets.GeneratorBasedBuilder):
 
     def _split_generators(self, dl_manager):
         """Returns SplitGenerators."""
-        # urls_to_download = {
-        #     "train": [f"{_URL}{self.config.lang}.train.json", f"{_URL}{self.config.lang}.train.zip"],
-        #     "val": [f"{_URL}{self.config.lang}.val.json", f"{_URL}{self.config.lang}.val.zip"],
-        #     # "test": [f"{_URL}{self.config.lang}.test.json", f"{_URL}{self.config.lang}.test.zip"],
-        # }
-        # downloaded_files = dl_manager.download_and_extract(urls_to_download)
-        # train_files_for_many_langs = [downloaded_files["train"]]
-        # val_files_for_many_langs = [downloaded_files["val"]]
-        # # test_files_for_many_langs = [downloaded_files["test"]]
-        file_dir = 'xfund&funsd/'
-        train_files_for_many_langs = [[file_dir+f"{self.config.lang}.train.json", file_dir+f"{self.config.lang}"]]
-        val_files_for_many_langs = [[file_dir+f"{self.config.lang}.val.json", file_dir+f"{self.config.lang}"]]
+
+        file_dir = self.config.data_dir
+
+        train_files_for_many_langs = [[file_dir + f"{self.config.lang}.train.json", file_dir + f"{self.config.lang}"]]
+        val_files_for_many_langs = [[file_dir + f"{self.config.lang}.val.json", file_dir + f"{self.config.lang}"]]
 
         if self.config.additional_langs:
             additional_langs = self.config.additional_langs.split("+")
@@ -92,8 +85,7 @@ class XFUN(datasets.GeneratorBasedBuilder):
                 # urls_to_download = {"train": [f"{_URL}{lang}.train.json", f"{_URL}{lang}.train.zip"]}
                 # additional_downloaded_files = dl_manager.download_and_extract(urls_to_download)
                 # train_files_for_many_langs.append(additional_downloaded_files["train"])
-                train_files_for_many_langs.append([file_dir+f"{lang}.train.json", file_dir+f"{lang}"])
-
+                train_files_for_many_langs.append([file_dir + f"{lang}.train.json", file_dir + f"{lang}"])
 
         logger.info(f"Training on {self.config.lang} with additional langs({self.config.additional_langs})")
         logger.info(f"Evaluating on {self.config.lang}")
@@ -128,9 +120,9 @@ class XFUN(datasets.GeneratorBasedBuilder):
                         continue
                     id2label[line["id"]] = line["label"]
                     relations.extend([tuple(sorted(l)) for l in line["linking"]])
-                    if '/en' in filepath[0]:
+                    if "/en" in filepath[0]:
                         tokenized_inputs = self.tokenizer(
-                            ' '.join([q['text'].replace(u'\uf703','') for q in line['words']]),
+                            " ".join([q["text"].replace("\uf703", "") for q in line["words"]]),
                             add_special_tokens=False,
                             return_offsets_mapping=True,
                             return_attention_mask=False,

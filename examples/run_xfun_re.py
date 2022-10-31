@@ -84,6 +84,7 @@ def main():
     datasets = load_dataset(
         os.path.abspath(LiLTfinetune.data.datasets.xfun.__file__),
         f"xfun.{data_args.lang}",
+        data_dir=data_args.data_dir,
         additional_langs=data_args.additional_langs,
         keep_in_memory=True,
     )

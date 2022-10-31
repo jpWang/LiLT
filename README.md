@@ -29,11 +29,6 @@ pip install -e .
 
 Or check [Detectron2](https://github.com/facebookresearch/detectron2/releases)/[PyTorch](https://pytorch.org/get-started/previous-versions/) versions and modify the command lines accordingly.
 
-## Datasets
-
-In this repository, we provide the fine-tuning codes for [FUNSD](https://guillaumejaume.github.io/FUNSD/) and [XFUND](https://github.com/doc-analysis/XFUND). 
-
-You can download our **pre-processed data (~1.2GB)** from [**HERE**](https://1drv.ms/u/s!Ahd-h7H5akVZeZQvKieg8g5THV8?e=mBRnxw), and put the unzipped `xfund&funsd/` under `LiLT/`. 
 
 ## Available Checkpoints
 
@@ -76,6 +71,11 @@ python gen_weight_roberta_like.py \
 
 ## Fine-tuning
 
+In this repository, we provide the fine-tuning codes for [FUNSD](https://guillaumejaume.github.io/FUNSD/) and [XFUND](https://github.com/doc-analysis/XFUND). 
+
+When fine-tuning on `FUNSD`, the dataset will be automatically download from [here](https://guillaumejaume.github.io/FUNSD/dataset.zip).
+
+When fine-tuning on `XFUND`, the **pre-processed data (~1.2GB)** should be downloaded from [**HERE**](https://1drv.ms/u/s!Ahd-h7H5akVZeZQvKieg8g5THV8?e=mBRnxw) in advance. The path to the unzipped data can be specified through the *--data_dir* args.
 
 ### Semantic Entity Recognition on FUNSD
 
@@ -99,6 +99,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
         --model_name_or_path lilt-infoxlm-base \
         --tokenizer_name xlm-roberta-base \
         --output_dir ls_ser_xfund_zh_lilt-infoxlm-base \
+        --data_dir {dir_to_preprocessed_xfund_data} \
         --do_train \
         --do_eval \
         --lang zh \
@@ -115,6 +116,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
         --model_name_or_path lilt-infoxlm-base \
         --tokenizer_name xlm-roberta-base \
         --output_dir ls_re_xfund_zh_lilt-infoxlm-base \
+        --data_dir {dir_to_preprocessed_xfund_data} \
         --do_train \
         --do_eval \
         --lang zh \
@@ -132,6 +134,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
         --model_name_or_path lilt-infoxlm-base \
         --tokenizer_name xlm-roberta-base \
         --output_dir mt_ser_xfund_all_lilt-infoxlm-base \
+        --data_dir {dir_to_preprocessed_xfund_data} \
         --do_train \
         --additional_langs all \
         --max_steps 16000 \
@@ -147,6 +150,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
         --model_name_or_path lilt-infoxlm-base \
         --tokenizer_name xlm-roberta-base \
         --output_dir mt_re_xfund_all_lilt-infoxlm-base \
+        --data_dir {dir_to_preprocessed_xfund_data} \
         --do_train \
         --additional_langs all \
         --max_steps 40000 \
